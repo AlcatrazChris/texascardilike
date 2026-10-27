@@ -1,0 +1,38 @@
+# Dependencies, local runtimes, deployment credentials and generated QA data
+node_modules/
+.tools/
+.vercel/
+.codex/
+.agents/
+.aws/
+
+# Keep templates, never real environment variables
+.env
+.env.*
+!.env.example
+!.env.*.example
+.envrc
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Build, coverage, download and temporary files
+dist/
+build/
+coverage/
+.nyc_output/
+.cache/
+.tmp/
+tmp/
+*.log
+*.tsbuildinfo
+
+# Editor and operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
