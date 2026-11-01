@@ -5,6 +5,7 @@
   <meta name="theme-color" content="#e8efeb"><meta name="description" content="River 德州扑克练习室。自定义牌局规则，与 AI 玩家对局，记录每一手的筹码与积分。">
   <title>River — 德州扑克练习室</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/refinements.css"><link rel="stylesheet" href="/lobby.css"><link rel="stylesheet" href="/table-updates.css"><link rel="stylesheet" href="/table-layout.css">
+  <link rel="stylesheet" href="/zipai.css">
   <script src="/app.js" type="module"></script>
 </head>
 <body data-screen="entry">
@@ -12,7 +13,7 @@
     <a class="brand entrance-brand" href="/"><span class="brand-mark">♠</span><span>river<span class="brand-dot">.</span></span></a>
     <div class="entry-card"><div class="entry-suit">♠</div><h1>好牌，和朋友一起打。</h1><p class="entry-intro">加入朋友的房间，或先来一场人机对局。</p>
       <form id="join-form"><label for="player-name">你的昵称</label><input id="player-name" maxlength="12" placeholder="请输入昵称" required autocomplete="nickname"><label for="room-code">房间号</label><div class="join-row"><input id="room-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="输入 6 位房间号" required><button class="button primary" type="submit">加入房间<span data-icon="arrow-right"></span></button></div></form>
-      <button id="new-online-room" class="text-button">没有房间号？创建联机房间</button><button id="resume-room" class="button secondary entry-resume hidden"></button>
+      <button id="new-online-room" class="text-button">没有房间号？创建联机房间</button><button id="try-zipai" class="text-button">玩法尝鲜：桂林字牌 →</button><button id="resume-room" class="button secondary entry-resume hidden"></button>
       <div class="entry-separator"><span>或</span></div><button id="solo-game" class="button solo-entry"><span data-icon="table"></span><span><strong>人机对局</strong><small>随时开桌，选择适合你的 AI 难度</small></span><span data-icon="arrow-right"></span></button><button id="resume-solo" class="text-button hidden">继续上次的人机牌局</button><p id="entry-error" class="form-error" role="alert"></p>
     </div><p class="entrance-footnote">虚拟筹码 · 思考每一步，享受每一手</p>
   </section>

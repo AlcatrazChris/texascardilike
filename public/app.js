@@ -1,6 +1,7 @@
 import { betError, multipleBet } from './betting.js';
 import { RoomClient } from './rooms-client.js';
 import {consumeGameResponse} from './game-client.js';
+import {createZipai,zipaiSummary} from './zipai.js';
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 const ICONS={table:'M3 7h18v10H3z M7 7v10 M17 7v10 M3 12h18',history:'M3 11a9 9 0 1 1 2.5 7 M3 4v7h7 M12 7v5l3 2',chart:'M4 20V4 M4 20h17 M8 16v-4 M13 16V8 M18 16V5',sliders:'M4 7h16 M4 17h16 M8 4v6 M16 14v6',plus:'M12 5v14 M5 12h14',book:'M12 5v15 M12 5C8 2 4 3 3 4v15c3-2 6-2 9 1 3-3 6-3 9-1V4c-3-2-6-2-9 1',menu:'M4 6h16 M4 12h16 M4 18h16','volume-off':'M10 4 5 8H2v8h3l5 4z M16 9l6 6 M22 9l-6 6',volume:'M10 4 5 8H2v8h3l5 4z M15 8a6 6 0 0 1 0 8 M18 4a11 11 0 0 1 0 16','arrow-up':'M12 19V5 M6 11l6-6 6 6','arrow-right':'M4 12h16 M14 6l6 6-6 6',wallet:'M4 6V4h14v4 M3 8h18v12H3z M16 12h5v4h-5z',trend:'M3 17l6-6 4 3 8-10 M15 4h6v6',layers:'m12 3 10 5-10 5L2 8z M2 12l10 5 10-5 M2 16l10 5 10-5',x:'M6 6l12 12 M18 6 6 18',info:'M12 11v6 M12 7h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',download:'M12 3v12 M7 10l5 5 5-5 M4 16v5h16v-5'};
@@ -17,6 +18,7 @@ const MODES={cash:'现金桌',tournament:'锦标赛',points:'积分桌'};
 const STREETS={preflop:'翻牌前',flop:'翻牌圈',turn:'转牌圈',river:'河牌圈','runout-vote':'全下投票',complete:'本手结束'};
 let game=null,token=null,busy=false,bet=0,sound=false,toastTimer,archives=[];
 let mode='solo',roomInfo=null,roomClient,displayedRoom='',displayedVersion=-1,settingsPurpose='solo',lobbySignature='',lastReportKey='',soloPollPending=false,reportTimer;
+const zipaiUI=createZipai({command:roomCommand,exit:exitGame,info:openInfo,toast,create:async config=>{const name=$('#player-name').value.trim()||'房主';storage.set('river-name',name);await roomClient.open('create',{config,name});}});
 const mySeat=()=>game?.mySeat??0;
 const storage={get(k){try{return localStorage.getItem(k);}catch{return null;}},set(k,v){try{localStorage.setItem(k,v);}catch{toast('浏览器存储不可用，本次牌局仍可继续');}}};
 try{archives=JSON.parse(storage.get('river-archives')||'[]');if(!Array.isArray(archives))archives=[];}catch{archives=[];}
@@ -115,6 +117,7 @@ function render(){
   renderActionHistory();renderActions();
 }
 function renderActions(){
+  if(roomInfo?.config.game==='zipai'){zipaiUI.setPending(busy);return;}
   const l=game?.legal,done=game?.street==='complete',voting=game?.street==='runout-vote',finished=game?.finished,me=game?.players[mySeat()];
   $('#fold').disabled=busy||!l;$('#call').disabled=busy||!l;$('#raise').disabled=busy||!l?.canRaise;
   const controls=$('#bet-controls'),available=!!l?.canRaise&&!done&&!voting;controls.classList.remove('hidden');controls.dataset.available=String(available);controls.inert=!available;$('.action-section').dataset.phase=voting?'vote':done?(mode==='room'?'ready':'done'):'bet';
@@ -302,6 +305,7 @@ function roomFailure(message,fatal=false){if(fatal){roomClient.stop();try{localS
 function renderLobby(){
   if(!roomInfo)return;const r=roomInfo;$('#lobby-code').textContent=r.code;$('#lobby-title').textContent=r.config.name;
   $('#lobby-hint').textContent=r.host?`已入座 ${r.members.length} / ${r.config.seats} 人。所有真人先准备，再由房主发牌；可选择 AI 补位或按现有人数开始。`:'等待房主开始。你可以把房间号分享给更多朋友。';
+  if(r.config.game==='zipai')$('#lobby-hint').textContent=zipaiSummary(r.config)+'。三人玩法，所有真人先准备；空位可由 AI 补齐。';
   const signature=JSON.stringify({code:r.code,members:r.members,levels:r.botLevels,host:r.host,fillAI:r.fillAI});
   if(signature!==lobbySignature){lobbySignature=signature;$('#lobby-members').innerHTML=Array.from({length:r.config.seats},(_,seat)=>{const member=r.members.find(m=>m.seat===seat);return member?`<div class="lobby-seat ${seat===r.mySeat?'me':''}"><span class="avatar">${escape(member.name[0])}</span><span><strong>${escape(member.name)}${seat===r.mySeat?' · 你':''}</strong><small>${member.host?'房主 · ':''}${member.ready?'已准备':member.online?'未准备':'暂时离线'}</small></span>${r.host&&member.removable&&member.seat!==r.mySeat?`<button data-remove-member="${escape(member.id)}" class="remove-seat">移除离线席位</button>`:''}</div>`:`<div class="lobby-seat"><span class="avatar">♣</span><span><strong>等待玩家</strong><small>空位 ${seat+1} · ${r.fillAI?'开始时补入 AI':'暂不入座'}</small></span><select data-bot-seat="${seat}" aria-label="座位 ${seat+1} 的 AI 难度" ${r.host?'':'disabled'}>${Object.entries(LEVEL_NAMES).map(([level,label])=>`<option value="${level}" ${r.botLevels[seat]===level?'selected':''}>${label} AI</option>`).join('')}</select></div>`;}).join('');
     $$('#lobby-members [data-remove-member]').forEach(button=>button.onclick=()=>roomCommand('remove',{memberId:button.dataset.removeMember}));
@@ -312,6 +316,7 @@ function renderLobby(){
 async function consumeRoom(data,ack){
   roomInfo=data.room;mode='room';$('#exit-label').textContent='退出房间';
   if(data.room.status==='waiting'){document.body.dataset.screen='lobby';renderLobby();return;}
+  if(roomInfo.config.game==='zipai'){game=null;busy=true;zipaiUI.setPending(true);try{await zipaiUI.consume(data,ack);}finally{busy=false;zipaiUI.setPending(false);}return;}
   document.body.dataset.screen='table';$('#online-table-info').classList.remove('hidden');$('#online-room-label').textContent=`房间 ${roomInfo.code} · ${roomInfo.members.length} 位真人`;
   const changed=displayedRoom!==roomInfo.code||displayedVersion!==roomInfo.version||!game||data.frames.length||data.reset;
   if(!changed){renderActions();return;}
@@ -334,6 +339,7 @@ async function exitGame(){
 $('#back-to-entry').onclick=exitGame;$('#leave-lobby').onclick=exitGame;
 $('#join-form').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;const name=$('#player-name').value.trim(),code=$('#room-code').value.trim();storage.set('river-name',name);$('#entry-error').textContent='';try{await roomClient.open('join',{code,name});}catch(error){$('#entry-error').textContent=error.message;}});
 $('#new-online-room').onclick=()=>{settingsPurpose='room';openSettings();};$('#solo-game').onclick=()=>{settingsPurpose='solo';openSettings();};
+$('#try-zipai').onclick=()=>zipaiUI.openSettings();
 $('#resume-room').onclick=async()=>{try{await roomClient.restore();}catch(error){roomFailure(error.message,/不存在|已关闭|身份无效|已退出/.test(error.message));$('#entry-error').textContent=error.message;}};
 $('#resume-solo').onclick=async()=>{mode='solo';token=storage.get('river-token');document.body.dataset.screen='table';$('#online-table-info').classList.add('hidden');$('#exit-label').textContent='返回入口';if(!await request('resume'))showEntry();};
 $('#start-room').onclick=()=>roomCommand('start');
