@@ -98,7 +98,7 @@ body[data-screen=zipai] #zipai-screen{position:fixed;inset:0 auto auto 0;min-hei
   .zp-result-players{grid-template-areas:'self' 'left' 'right'}.zp-result-player.self{width:100%}
   .zp-result-seats{gap:5px}.zp-result-seats button{min-height:30px;font-size:10px}
 }
-@media(max-height:480px) and (orientation:landscape){
+@media(max-height:600px) and (orientation:landscape){
   body[data-screen=zipai] #zipai-screen{grid-template-rows:26px 17px 23px minmax(0,1fr);padding:3px 9px max(3px,env(safe-area-inset-bottom));gap:2px}
   #zipai-screen .zp-arena{grid-template-columns:140px minmax(0,1fr);grid-template-rows:minmax(0,1fr) 48px var(--hand-height);gap:2px}
   #zipai-screen .zp-own-area{grid-template-columns:64px minmax(0,1fr);gap:6px;padding:0 1px 5px}
