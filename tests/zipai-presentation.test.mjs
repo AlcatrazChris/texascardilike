@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {tileHTML,handColumns,resultLabels,playerResultRole} from '../public/zipai-presentation.js';
+import * as z from '../lib/zipai.mjs';
+
+function winningFixture(kind){
+  const g=z.newGame({rounds:3,special:false}),used=new Map(),cards=types=>types.map(t=>{const n=used.get(t)||0;used.set(t,n+1);return t*4+n;});
+  const hole=cards([0,0,0,1,1,1,2,2,2,10,10,10,11,11,11,12,12,12,13,13,13]),winning=kind==='self-draw'?0:hole.at(-1),available=Array.from({length:80},(_,i)=>i).filter(c=>!hole.includes(c));
+  for(const p of g.players){p.human=true;p.melds=[];p.discards=[];p.passedHu=[];p.passedEat=[];p.passedPeng=[];p.heavyOwed=0;}
+  g.players[0].hole=kind==='self-draw'?hole:hole.slice(0,-1);g.players[1].hole=available.splice(0,20);g.players[2].hole=available.splice(0,20);g.deck=available;g.turn=0;g.street=kind==='self-draw'?'discard':'respond';g.queue=kind==='self-draw'?[]:[{seat:0,kind:'hu'}];g.current={card:winning,source:kind==='self-draw'?0:1,draw:kind!=='discard',claimed:kind==='self-draw'};g.drawCount=3;g.discardCount=6;g.wakes=[];g.history=[];g.handLog=[];z.act(g,0,'hu');return g;
+}
+test('长条字牌使用正反两个字面，红黑和牌张 0 正确，高亮不丢失',()=>{const zero=tileHTML(0,{winning:true});assert.match(zero,/zp-face-reverse/);assert.match(zero,/zp-winning-card/);assert.match(zero,/小字一/);assert.match(tileHTML(4),/zp-red/);assert.match(tileHTML('?'),/隐藏字牌/);assert.doesNotMatch(tileHTML('?'),/undefined|NaN/);});
+test('手牌竖列分组保持全部物理牌与顺序，不改变游戏手牌',()=>{const cards=[0,1,2,4,8,12,13,40,41,42,44,48,52,56,60,64,68,72,76,77,78],copy=cards.slice(),columns=handColumns(cards);assert.deepEqual(columns.flat(),copy);assert.deepEqual(cards,copy);assert.ok(columns.every(c=>c.length<=3));});
+test('点炮、自摸、公开摸牌胡和荒庄展示不同标签，旧记录不猜测点炮者',()=>{assert.equal(resultLabels({draw:true}).title,'荒庄');assert.equal(resultLabels({selfDraw:true}).title,'自摸');assert.equal(resultLabels({winKind:'discard',discarder:0}).kind,'discard');assert.equal(playerResultRole({winner:2,discarder:0},0),'discarder');assert.equal(playerResultRole({winner:2,discarder:0},2),'winner');assert.equal(playerResultRole({winner:2,winKind:'public-draw'},0),'other');assert.equal(resultLabels({winner:1}).subtitle,'本局胡牌');});
+test('结算保存三家真实手牌、副露、弃牌与剩余底牌，历史快照不随下一局改变',()=>{const g=winningFixture('discard'),h=g.history[0];assert.equal(h.players.length,3);for(const p of h.players){assert.ok(Array.isArray(p.hole));assert.ok(Array.isArray(p.melds));assert.ok(Array.isArray(p.discards));}assert.equal(h.winKind,'discard');assert.equal(h.discarder,1);assert.equal(h.winCard,54);assert.equal(h.players[0].hole.length,21);const snapshot=JSON.stringify(h),expected=g.deck.slice();assert.deepEqual(h.remainingCards,expected);z.startHand(g);assert.equal(JSON.stringify(h),snapshot);assert.notDeepEqual(g.players[0].hole,h.players[0].hole);});
+test('自摸和公开摸牌胡不会被标为点炮，零号胡牌张和全局结算视图保留',()=>{for(const kind of ['self-draw','public-draw']){const g=winningFixture(kind),h=g.history[0];assert.equal(h.winKind,kind);assert.equal(h.discarder,null);if(kind==='self-draw')assert.equal(h.winCard,0);for(let seat=0;seat<3;seat++){const v=z.view(g,seat);assert.ok(v.players.every(p=>p.hole.every(c=>c!=='?')));assert.deepEqual(v.history[0].players,h.players);}}});

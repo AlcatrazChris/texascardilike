@@ -171,7 +171,7 @@ $$('[data-multiple]').forEach(button=>button.addEventListener('click',()=>{
 }));
 $('#fold').onclick=()=>request('action',{action:'fold'});$('#call').onclick=()=>request('action',{action:game?.legal?.check?'check':'call'});$('#raise').onclick=submitBet;
 $('#next-hand').onclick=()=>game?.finished?openSettings():request('next');
-document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||document.querySelector('dialog[open]')||['INPUT','SELECT','TEXTAREA','BUTTON'].includes(document.activeElement?.tagName))return;const id=({f:'fold',c:'call',r:'raise'})[e.key.toLowerCase()];if(id&&!$('#'+id).disabled)$('#'+id).click();});
+document.addEventListener('keydown',e=>{if(document.body.dataset.screen!=='table'||e.repeat||e.ctrlKey||e.metaKey||e.altKey||document.querySelector('dialog[open]')||['INPUT','SELECT','TEXTAREA','BUTTON'].includes(document.activeElement?.tagName))return;const id=({f:'fold',c:'call',r:'raise'})[e.key.toLowerCase()];if(id&&!$('#'+id).disabled)$('#'+id).click();});
 function closeSidebar(){$('#sidebar').classList.remove('open');$('#scrim').classList.remove('visible');}
 $('#menu').onclick=()=>{$('#sidebar').classList.add('open');$('#scrim').classList.add('visible');};$('#scrim').onclick=closeSidebar;
 $$('.close-dialog').forEach(b=>b.onclick=()=>b.closest('dialog').close());
