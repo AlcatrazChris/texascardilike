@@ -50,3 +50,26 @@ body[data-screen=zipai] #zipai-screen{display:block}
   .zp-result-header{left:2%;right:2%;height:22px}.zp-result-header h2{font-size:16px}.zp-result-header label{font-size:8px}.zp-result-header select{padding:2px;font-size:8px}.zp-result-close{font-size:20px;height:22px}.zp-result-summary{top:23px;left:2%;right:2%;font-size:8px}.zp-result-summary strong{font-size:9px}.zp-result-summary small,.zp-result-summary p{font-size:8px}.zp-result-player{padding:4px;border-width:1px}.zp-result-player.left{left:2%;top:43px;width:29%}.zp-result-player.right{right:2%;top:43px;width:29%}.zp-result-player.self{left:33%;width:34%;bottom:33px}.zp-result-profile{height:18px;margin-bottom:3px;gap:4px}.zp-result-profile strong{font-size:8px}.zp-result-profile b{font-size:17px}.zp-role-tag{font-size:7px}.winner .zp-role-tag{padding:2px}.zp-result-card-zone{gap:5px}.zp-result-table-zone{padding-left:5px}.zp-zone-label{font-size:7px;margin-bottom:3px}.zp-result-card-columns{padding-bottom:9px}.zp-column-hu{bottom:-9px;font-size:7px}.zp-wake-display{left:35%;width:30%;top:27%;flex-direction:row;gap:8px;--card-width:16px;--card-height:45px}.zp-wake-display>div small{display:none}.zp-wake-display>strong{font-size:34px}.zp-remaining-cards{left:2%;right:71%;top:68%;--card-width:11px;--card-height:18px}.zp-remaining-cards h3{font-size:8px;margin-bottom:3px}.zp-remaining-cards .zp-face{font-size:9px;top:1px}.zp-remaining-cards>div{gap:1px}.zp-result-footer{bottom:0;left:32%;right:1%;min-height:28px;gap:4px}.zp-result-footer .button{min-height:25px;padding:3px 12px;font-size:10px}.zp-result-footer .zp-ready-members{flex-basis:auto;font-size:7px}.zp-result-history{top:26px;font-size:7px}
 }
 @media(max-width:600px) and (orientation:portrait){.zp-center{top:11%}}
+/* The live card belongs to its seat; reserve space on the right of each avatar. */
+#zipai-screen{--current-width:53px}
+.zp-current{--card-width:var(--current-width);width:var(--current-width)}
+.zp-current.hidden{display:none}
+.zp-opponent.right .zp-player{right:calc(var(--current-width) + 16px)}
+.zp-opponent .zp-public{left:calc(var(--profile-width) + var(--current-width) + 32px)}
+.zp-opponent.right .zp-public{left:auto;right:calc(var(--profile-width) + var(--current-width) + 32px)}
+.zp-self-melds{left:calc(var(--profile-width) + var(--current-width) + 32px);width:calc(24% - var(--profile-width) - var(--current-width) - 40px)}
+.zp-hand-heading{justify-content:flex-end}
+.zp-hu-line{font-size:23px;font-weight:800;line-height:1.2;color:#ffe99a;margin:7px 0;text-shadow:0 1px 3px #354c25}
+.zp-final-outcome{flex-direction:column;gap:5px;text-align:center}
+.zp-final-outcome>span{font-size:17px;font-weight:600;color:#fff0bd}
+@media(max-width:1000px){#zipai-screen{--current-width:37px}.zp-hu-line{font-size:20px}}
+@media(max-width:600px) and (orientation:portrait){
+  #zipai-screen{--current-width:32px}
+  .zp-self-summary{left:calc(50% - 50px);width:70px}.zp-self-summary .zp-player{width:70px}
+  .zp-opponent .zp-public{top:124px;left:0;width:31%}
+  .zp-opponent.right .zp-public{left:auto;right:0;width:31%}
+  .zp-self-melds{top:124px;bottom:auto;left:34%;width:32%}
+  .zp-center{top:auto;left:auto;right:0;bottom:calc(var(--hand-height) + 6px)}
+  .zp-hu-line{font-size:17px;margin:5px 0}.zp-final-outcome>span{font-size:14px}
+}
+@media(max-height:600px) and (orientation:landscape){#zipai-screen{--current-width:23px}.zp-self-melds{width:calc(26% - var(--profile-width) - var(--current-width) - 40px)}.zp-melds{gap:2px}.zp-hu-line{font-size:15px;margin:3px 0}.zp-final-outcome>span{font-size:12px}}
