@@ -2,7 +2,14 @@ export const words=[...'一二三四五六七八九十',...'壹贰叁肆伍陆�
 export const typeOf=card=>Math.floor(card/4);
 export const cardName=card=>words[typeOf(card)]||'';
 export const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export const meldLabels={chi:'吃',peng:'碰',sao:'扫',guosao:'过扫',kan:'坎',kai:'开舵',chuan:'扫穿',pair:'对',single:'散牌'};
+export const meldLabels={chi:'吃',peng:'碰',sao:'扫',guosao:'过扫',kan:'坎',kai:'开招',chuan:'扫穿',pair:'对',single:'散牌'};
+
+export function scoreFormula(h,base=1){
+  if(!h||h.draw)return '本局荒庄，不计分';
+  const wake=h.wakeUnits-(h.sea?2:0),parts=`基础 ${h.baseUnits}${h.special?' + '+h.special+' 1':''} + 醒 ${wake}${h.sea?' + 海底 2':''}`;
+  if(h.scoringVersion===2)return `${h.selfDraw?'（':''}${parts}${h.selfDraw?'）× 自摸 2':''} = ${h.units} 子 × 底分 ${base}`;
+  return `基础 ${h.baseUnits}${h.selfDraw?' + 自摸 1':''}${h.special?' + '+h.special+' 1':''} + 醒 ${wake}${h.sea?' + 海底 2':''} = ${h.units} 子 × 底分 ${base}`;
+}
 
 export function tileHTML(card,{winning=false}={}){
   const back=card==='?',t=typeOf(card),text=back?'字':cardName(card),red=!back&&[1,6,9].includes(t%10);

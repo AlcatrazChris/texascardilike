@@ -1,7 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {tileHTML,handColumns,resultLabels,playerResultRole} from '../public/zipai-presentation.js';
+import {tileHTML,handColumns,resultLabels,playerResultRole,scoreFormula} from '../public/zipai-presentation.js';
 import * as z from '../lib/zipai.mjs';
+
+test('自摸将基础和醒一起翻倍，旧记录保留旧算法展示',()=>{
+  const record={baseUnits:3,wakeUnits:2,selfDraw:true,units:10,scoringVersion:2};
+  assert.equal(scoreFormula(record,2),'（基础 3 + 醒 2）× 自摸 2 = 10 子 × 底分 2');
+  assert.match(scoreFormula({...record,scoringVersion:undefined,units:6}),/自摸 1.*= 6 子/);
+  assert.doesNotMatch(scoreFormula({...record,selfDraw:false,units:5}),/自摸/);
+});
 
 function winningFixture(kind){
   const g=z.newGame({rounds:3,special:false}),used=new Map(),cards=types=>types.map(t=>{const n=used.get(t)||0;used.set(t,n+1);return t*4+n;});

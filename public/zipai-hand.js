@@ -1,5 +1,13 @@
 // Layout is a client preference. It never changes hand ownership or legal moves.
 const type=card=>Math.floor(card/4);
+// Reserve all five rows up front. Neither sorting nor a changed group length
+// may resize cards or displace the table and its controls.
+export function handGeometry(width,height){
+  const portrait=width<=600&&height>width;
+  const w=portrait?(height<700||width<380?28:34):height<=340?20:height<=480?26:height<=600?32:height<850?46:54;
+  const h=Math.round(w*2.85),step=Math.round(w*.77);
+  return {width:w,height:h,step,reserved:h+step*4+(height<=480?26:44)};
+}
 const patterns=[];
 for(const base of [0,10]){patterns.push({types:[base+1,base+6,base+9],score:14},{types:[base,base+1,base+2],score:14});for(let n=1;n<8;n++)patterns.push({types:[base+n,base+n+1,base+n+2],score:10});}
 for(let n=0;n<10;n++)patterns.push({types:[n,n,n+10],score:9},{types:[n,n+10,n+10],score:9});

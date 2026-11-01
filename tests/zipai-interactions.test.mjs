@@ -4,7 +4,15 @@ import {randomUUID} from 'node:crypto';
 import * as z from '../lib/zipai.mjs';
 import {roomService}from'../lib/rooms.mjs';
 import {memoryRoomStore}from'../lib/room-store.mjs';
-import {autoArrange,reconcileLayout,moveLayoutCard,shouldDiscardGesture,actionPause}from'../public/zipai-hand.js';
+import {autoArrange,reconcileLayout,moveLayoutCard,shouldDiscardGesture,actionPause,handGeometry}from'../public/zipai-hand.js';
+
+test('每个视口固定预留五张一笔高度，理牌和列数不参与牌张尺寸计算',()=>{
+  for(const [w,h] of [[1715,1012],[1366,768],[390,844],[390,640],[360,600],[844,390],[844,320]]){
+    const s=handGeometry(w,h);assert.ok(s.reserved>=s.height+4*s.step+26);
+    assert.ok(s.reserved<h-100);assert.ok(s.width>=20);
+    assert.deepEqual(handGeometry(w,h),s);
+  }
+});
 function fixture(repeat=false){const g=z.newGame({rounds:2,special:false}),seen=new Map(),cards=types=>types.map(t=>{const n=seen.get(t)||0;seen.set(t,n+1);return t*4+n;});for(const p of g.players){p.human=true;p.hole=[];p.melds=[];p.discards=[];p.passedHu=[];p.passedEat=[];p.passedPeng=[];}g.players[0].hole=cards(repeat?[1,1,1,2,2,2,10,10,10,11,11,11,12,12,12,13,13]:[0,0,0,1,1,1,2,2,2,10,10,10,11,11,11,12,12,12,13,13,13]);if(repeat)g.players[0].melds=[{kind:'chuan',cards:[0,1,2,3],hu:9,concealed:true}];g.players[1].hole=[60,64];g.players[2].hole=[68,72];g.street='discard';g.turn=0;g.drawCount=2;g.discardCount=4;g.current={card:54,source:0,draw:true,claimed:true};g.queue=[];g.history=[];g.handLog=[];g.wakes=[];g.deck=repeat?[16,36,7]:[79,75,71];return g;}
 test('胡牌先停在翻醒阶段，分数和牌堆不提前变化，不泄露下一张醒牌',()=>{const g=fixture(),deck=g.deck.slice();z.act(g,0,'hu');assert.equal(g.street,'wake');assert.deepEqual(g.deck,deck);assert.equal(g.history.length,0);assert.equal(g.result,null);assert.deepEqual(g.players.map(p=>p.score),[0,0,0]);for(let i=0;i<3;i++){const v=z.view(g,i);assert.equal(v.legal.wake,true);assert.ok(!('pendingWin'in v));assert.ok(!('deck'in v));assert.equal(v.wakes.length,0);assert.ok(v.players[0].hole.every(c=>c!=='?'));if(i!==1)assert.ok(v.players[1].hole.every(c=>c==='?'));}assert.throws(()=>z.startHand(g),/尚未结束/);assert.throws(()=>z.act(g,0,'discard',0));});
 test('任何在座真人可翻醒，一次操作只消耗一张，最终只计分一次',()=>{const g=fixture();z.act(g,0,'hu');const before=g.deck.length;z.act(g,2,'wake');assert.equal(g.deck.length,before-1);assert.equal(g.wakes.length,1);assert.equal(g.street,'complete');assert.equal(g.history.length,1);assert.equal(g.players.reduce((s,p)=>s+p.score,0),0);assert.throws(()=>z.act(g,1,'wake'),/翻醒阶段/);assert.equal(g.history.length,1);});
