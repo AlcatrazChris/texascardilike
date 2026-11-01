@@ -8,6 +8,10 @@ export function handGeometry(width,height){
   const h=Math.round(w*2.85),step=Math.round(w*.77);
   return {width:w,height:h,step,reserved:h+step*4+(height<=480?26:44)};
 }
+export function handSpread(width,cardWidth,count){
+  const pitch=Math.min(cardWidth+6,Math.max(0,(width-cardWidth-3)/Math.max(1,count-1)));
+  return Array.from({length:count},(_,i)=>Math.round(i*pitch));
+}
 const patterns=[];
 for(const base of [0,10]){patterns.push({types:[base+1,base+6,base+9],score:14},{types:[base,base+1,base+2],score:14});for(let n=1;n<8;n++)patterns.push({types:[base+n,base+n+1,base+n+2],score:10});}
 for(let n=0;n<10;n++)patterns.push({types:[n,n,n+10],score:9},{types:[n,n+10,n+10],score:9});
@@ -63,7 +67,8 @@ export function shouldDiscardGesture({startX,startY,x,y,hand,arena,legal=false,p
 export function actionPause(event,players){
   if(event.type==='hu')return 1800;if(event.type==='settle')return 800;if(event.type==='wake')return 1400;
   const actor=players.find(p=>p.id===event.playerId),ai=actor&&!actor.human;
-  if(ai&&['draw','discard','pass','meld'].includes(event.type))return 1050;
-  if(event.type==='draw'||event.type==='discard')return 900;
+  if(event.type==='draw')return ai?1550:1400;
+  if(ai&&['discard','pass','meld'].includes(event.type))return 1050;
+  if(event.type==='discard')return 900;
   return event.type==='meld'?650:350;
 }

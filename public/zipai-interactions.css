@@ -1,137 +1,23 @@
-/* Invariant table, controls and five-row hand geometry. */
-body[data-screen=zipai]{overflow:hidden;overscroll-behavior:none}
-body[data-screen=zipai] #zipai-screen{position:fixed;inset:0 auto auto 0;min-height:0;grid-template-columns:minmax(0,1fr);padding-bottom:max(5px,env(safe-area-inset-bottom));height:100dvh;box-sizing:border-box}
-#zipai-screen .zp-arena{display:grid;grid-template-columns:minmax(180px,25%) minmax(0,1fr);grid-template-rows:minmax(0,1fr) 80px var(--hand-height);gap:8px;min-width:0;min-height:0;overflow:hidden}
-#zipai-screen .zp-stage{position:relative;inset:auto;grid-area:1/1/2/3;width:100%;height:100%;min-height:0;overflow:hidden}
-#zipai-screen .zp-own-area{grid-area:3/1;min-width:0;min-height:0;display:grid;grid-template-columns:var(--profile-width) minmax(0,1fr);gap:12px;align-items:end;padding:0 3px 7px}
-#zipai-screen .zp-self-summary{position:static;grid-area:1/1;align-self:end;min-width:0}
-#zipai-screen .zp-self-melds{position:static;grid-area:1/2;align-self:end;width:100%;max-width:none;min-width:0;max-height:100%;overflow:auto;overscroll-behavior:contain}
-#zipai-screen .zp-self-melds .zp-melds{min-height:0;max-height:210px;overflow:auto}
-#zipai-screen .zp-self-melds .zp-discards{max-height:46px}
-#zipai-screen .zp-public:empty,#zipai-screen .zp-opponent-cards{display:none}
-#zipai-screen .zp-controls,#zipai-screen .zp-controls:has(.zp-ready-members){position:relative;inset:auto;grid-area:2/1/3/3;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:18px minmax(0,1fr);align-items:center;gap:3px 12px;width:100%;height:80px;min-height:0;max-height:none;padding:0 6px;background:transparent;border:0;border-radius:0;box-shadow:none;z-index:20;overflow:hidden}
-#zipai-screen .zp-controls>p{grid-area:1/1/2/3;text-align:center;font-size:11px;min-height:16px;max-width:100%}
-#zipai-screen .zp-options,#zipai-screen .zp-options:empty{position:static;inset:auto;grid-area:2/1;display:flex;width:100%;max-width:100%;height:100%;min-height:0;max-height:none;justify-content:flex-end;align-items:center;overflow:auto;padding:2px}
-#zipai-screen .zp-options:empty{visibility:hidden}
-#zipai-screen .zp-option{--card-width:15px;--card-height:43px;gap:5px;padding:3px 7px;min-height:44px}
-#zipai-screen .zp-option .zp-face,#zipai-screen .zp-option .zp-face-reverse{font-size:13px}
-#zipai-screen .zp-option strong{font-size:20px}
-#zipai-screen .zp-actions{grid-area:2/2;justify-content:center;flex-direction:row;gap:10px;flex-wrap:wrap;max-height:100%;overflow:auto}
-#zipai-screen .zp-actions .button{min-width:102px;height:42px;min-height:42px;font-size:17px;padding:6px 18px;touch-action:manipulation;border-radius:9px}
-#zipai-screen .zp-ready-members{text-align:center;font-size:10px}
-#zipai-screen .zp-controls:not(:has(.zp-option)) .zp-actions{grid-column:1/3}
-#zipai-screen .zp-hand-area{position:relative;inset:auto;grid-area:3/2;width:100%;height:var(--hand-height);min-width:0;min-height:0;max-width:100%;margin:0;align-self:end}
-#zipai-screen .zp-hand-heading{height:26px;min-height:26px;font-size:10px}
-#zipai-screen .zp-hand-cards{position:relative;justify-content:flex-start;align-items:flex-end;gap:7px;padding:9px 4px 6px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;scrollbar-width:thin;scrollbar-color:#a9bc7d transparent}
-#zipai-screen .zp-hand-column{position:relative;min-width:var(--card-width);min-height:var(--card-height);padding-bottom:0;flex-shrink:0;align-self:flex-end}
-#zipai-screen .zp-hand-column:first-child{margin-left:auto}#zipai-screen .zp-hand-column:last-child{margin-right:auto}
-#zipai-screen .zp-hand-card{height:var(--card-step);cursor:grab;touch-action:none;-webkit-touch-callout:none;user-select:none}
-#zipai-screen .zp-hand-card:last-of-type{height:var(--card-height)}
-.zp-column-space{pointer-events:none;position:absolute;bottom:0;left:0;right:0;height:8px;font-size:12px;text-align:center;color:#d1df9b66}
-.zp-empty-column{border:1px dashed #b9cf7d3b;border-radius:7px}.zp-empty-column .zp-column-space{top:30px;height:20px}
-.zp-new-column{border:1px dashed #b9cf7d33;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#d6e4ab65;font-size:21px}
-.zp-drop-target{outline:2px dashed #ffe097;outline-offset:1px;background:#dddf7722;border-radius:7px}
-.zp-drag-ghost{position:fixed;top:0;left:0;z-index:1000;pointer-events:none;will-change:transform;filter:drop-shadow(0 8px 9px #051c2266);transform:translate3d(-200px,-400px,0)}
-.zp-drag-ghost .zp-tile{transform:rotate(-3deg);border-color:#ffe194}
-.zp-discard-cue{position:absolute;left:35%;right:15%;top:25%;bottom:40%;z-index:8;display:none;align-items:center;justify-content:center;pointer-events:none;border:2px dashed #ffe29c;border-radius:18px;background:#dfda6b22;color:#fff1ad;font-size:22px;letter-spacing:3px}.zp-discard-cue.active{display:flex}
-#zipai-screen .zp-current{position:absolute;z-index:4;pointer-events:none;width:100px;align-items:center;transform:none;transition:none;--card-width:38px;--card-height:110px}
-#zipai-screen .zp-current[data-position=left]{left:32%;top:35%;right:auto;bottom:auto}
-#zipai-screen .zp-current[data-position=right]{right:32%;top:35%;left:auto;bottom:auto}
-#zipai-screen .zp-current[data-position=self]{left:47%;bottom:0;top:auto;right:auto}
-#zipai-screen .zp-current>small{font-size:10px;font-weight:600;background:#153d2cbb;border-radius:4px;padding:2px 4px;min-height:0;max-width:150px;color:#fff0c3}
-#zipai-screen .zp-current>small:empty{display:none}
-#zipai-screen .zp-center{top:5px;left:50%;width:20%;gap:8px}
-#zipai-screen .zp-center>p{font-size:10px}
-#zipai-screen .zp-opponent{top:4px;width:32%;height:calc(100% - 8px);min-height:0;grid-template-rows:minmax(0,1fr) 16px;overflow:hidden}
-#zipai-screen .zp-opponent .zp-player{height:156px;max-height:100%;box-sizing:border-box;overflow:hidden}
-#zipai-screen .zp-opponent .zp-public{min-height:0;max-height:100%;overflow:auto}
-#zipai-screen .zp-opponent .zp-melds{min-height:0;max-height:175px}
-#zipai-screen .zp-player-action{grid-row:2;font-size:10px;margin:0;overflow:hidden;text-overflow:ellipsis}
-#zipai-screen .zp-felt{inset:0 -24px}
-/* Wake overlay never changes table/hand row dimensions. */
-#zipai-screen .zp-wake-panel{position:absolute;z-index:40;left:50%;top:50%;transform:translate(-50%,-50%);width:min(430px,86%);max-height:calc(100% - 8px);box-sizing:border-box;padding:14px 24px;background:linear-gradient(130deg,#174e3ff7,#183c2bf7);border:1px solid #d8bb6b;border-radius:14px;box-shadow:0 10px 50px #071f2670;text-align:center;display:grid;grid-template-rows:auto auto minmax(35px,1fr) auto auto;gap:5px;overflow:hidden}
-#zipai-screen .zp-wake-panel.hidden{display:none}
-.zp-wake-panel>small{color:#e6dfb1;font-size:11px}.zp-wake-panel h2{margin:3px 0;font:700 28px 'KaiTi',serif;color:#ffdf8c}.zp-wake-panel p{font-size:11px;color:#c4d5a4;margin:5px 0}.zp-wake-panel>.button{justify-self:center;min-width:145px;min-height:42px;color:#244c36;background:linear-gradient(#ffedb9,#d7bc64);border:1px solid #fff0ba;font-size:17px;border-radius:7px}
-.zp-wake-cards{display:flex;align-items:center;justify-content:center;gap:12px;min-height:0;max-height:140px;overflow:auto;--card-width:30px;--card-height:87px}.zp-wake-cards>div{display:flex;align-items:center;gap:5px}.zp-wake-cards small{font-size:10px;color:#cfdfad;max-width:65px;line-height:1.8}.zp-waking .zp-current{visibility:hidden}.zp-waking .zp-hand-area{opacity:.65;pointer-events:none}
-.zp-wake-reveal{position:absolute;left:50%;top:35%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:9px;color:#ffe59f;--card-width:52px;--card-height:150px}.zp-wake-reveal>small{font-size:15px;letter-spacing:4px}.zp-wake-reveal>strong{font-size:29px}.zp-wake-reveal .zp-tile{animation:zp-turn-wake 1.1s ease-out both;box-shadow:0 0 18px #f7d48380;border-color:#ffe08d}
+.zp-drop-target{outline:2px dashed #ffe497;outline-offset:1px;background:#e4dc5c22;border-radius:6px}.zp-drag-ghost{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;will-change:transform;transform:translate3d(-200px,-400px,0);filter:drop-shadow(0 7px 9px #17392566)}.zp-drag-ghost .zp-tile{transform:rotate(-3deg);border-color:#ffe594}
+.zp-discard-cue{position:absolute;left:35%;right:20%;top:25%;bottom:45%;z-index:19;display:none;align-items:center;justify-content:center;pointer-events:none;border:2px dashed #ffe29b;border-radius:20px;color:#fff0b3;background:#e4d77422;font-size:24px;letter-spacing:4px}.zp-discard-cue.active{display:flex}
+.zp-effects{position:absolute;inset:0;pointer-events:none;z-index:60;overflow:hidden}.zp-effects:empty{display:none}.zp-paused *{animation-play-state:paused!important}
+.zp-seat-callout{position:absolute;font:900 54px 'KaiTi',serif;color:#fff1c1;text-shadow:0 3px 0 #704322,0 0 14px #e1b84c;animation:zp-callout 1s both}.zp-seat-callout.left{left:16%;top:20%}.zp-seat-callout.right{right:16%;top:20%}.zp-seat-callout.self{left:36%;bottom:36%}.zp-seat-callout small{display:block;font:11px sans-serif;text-shadow:none}.zp-discard-callout{color:#fff0e6;text-shadow:0 3px 0 #822c29,0 0 18px #dd6052}.zp-discard-callout strong{font:inherit}
+.zp-win-halo{position:absolute;left:50%;top:38%;width:390px;height:390px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(#ffe37d44,transparent 68%);animation:zp-halo 1.9s both}.zp-win-effect{position:absolute;left:50%;top:31%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;color:#ffeca2;text-shadow:0 3px 0 #8b5d23,0 0 18px #f3cc6e;animation:zp-win 1.9s both}.zp-win-effect>strong{font:900 86px 'KaiTi',serif;letter-spacing:9px;white-space:nowrap}.zp-win-effect>small,.zp-effect-kicker{font-size:13px;color:#fff4bd;letter-spacing:2px}.zp-effect-seal{position:absolute;right:-30px;top:27px;background:#c33d33;border:2px solid #ffe896;border-radius:7px;color:#ffefb3;padding:7px;font:700 22px 'KaiTi',serif;transform:rotate(10deg)}.zp-effect-card{--card-width:49px;--card-height:140px;position:absolute;left:calc(50% - 24px);top:50%;animation:zp-winning-strip 1.9s both}.zp-sparks{position:absolute;left:50%;top:38%}.zp-sparks i{position:absolute;width:5px;height:5px;background:#ffe58b;border-radius:50%;box-shadow:0 0 8px #ffefa3;animation:zp-spark 1.7s var(--delay) both;transform:rotate(var(--angle)) translateX(40px)}
+.zp-wake-panel,.zp-wake-reveal{position:absolute;z-index:40;left:50%;top:35%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:#ffdf83;--card-width:55px;--card-height:157px;pointer-events:none}.zp-wake-panel.hidden{display:none}.zp-wake-panel strong,.zp-wake-reveal strong{font:900 76px 'KaiTi',serif;text-shadow:0 3px 0 #8b6120,0 0 15px #f5db8a88;line-height:1}.zp-wake-panel em,.zp-wake-reveal em{font-style:normal;font-size:.65em;margin-left:5px}.zp-wake-panel small,.zp-wake-reveal small{font-size:13px;letter-spacing:4px}.zp-wake-cards{display:flex;gap:8px}.zp-wake-reveal .zp-tile{animation:zp-turn-wake 1s ease-out;box-shadow:0 0 20px #ffde7380;border-color:#ffe493}
+.zp-deal-motion{position:absolute;inset:0;--card-width:30px;--card-height:85px}.zp-deal-motion i{position:absolute;top:4%;left:49%;opacity:0;animation:zp-deal 1.3s calc(var(--i)*65ms) both}.zp-deal-motion i:nth-child(3n+1){--dx:-33vw;--dy:9vh;--rotate:-85deg}.zp-deal-motion i:nth-child(3n+2){--dx:33vw;--dy:9vh;--rotate:85deg}.zp-deal-motion i:nth-child(3n){--dx:-8vw;--dy:48vh;--rotate:0deg}.zp-draw-motion{position:absolute;left:49%;top:3%;--card-width:23px;--card-height:66px;animation:zp-draw .55s ease-out both}.zp-draw-motion.left{--dx:-21vw;--dy:19vh}.zp-draw-motion.right{--dx:21vw;--dy:19vh}.zp-draw-motion.self{--dx:0px;--dy:23vh}
+@keyframes zp-card-arrive{from{opacity:.2;transform:translateY(-15px) rotateY(80deg)}to{opacity:1;transform:none}}
+@keyframes zp-deal{0%{opacity:0;transform:scale(.5)}15%{opacity:1}80%{opacity:1;transform:translate(var(--dx),var(--dy)) rotate(var(--rotate))}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rotate)) scale(.7)}}
+@keyframes zp-draw{0%{opacity:1;transform:none}70%{opacity:1;transform:translate(var(--dx),var(--dy)) rotateY(70deg)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotateY(90deg)}}
+@keyframes zp-callout{0%{opacity:0;transform:scale(1.6)}25%,80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(-12px)}}
+@keyframes zp-win{0%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}20%,85%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-57%) scale(.98)}}
+@keyframes zp-halo{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}35%,80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.25)}}
+@keyframes zp-winning-strip{0%{opacity:0;transform:translateY(70px) rotateY(80deg)}30%,85%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes zp-spark{0%{opacity:0;transform:rotate(var(--angle)) translateX(40px)}30%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateX(180px)}}
 @keyframes zp-turn-wake{0%{transform:rotateY(90deg) scale(.7);opacity:.2}35%,100%{transform:none;opacity:1}}
-.zp-result-seats{display:flex;position:sticky;top:-1px;z-index:2;gap:7px;padding:6px 0 9px;background:#174638}
-.zp-result-seats button{flex:1;min-height:32px;padding:5px 9px;border:1px solid #94b07980;border-radius:6px;color:#f2e9b4;background:#23543e;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-@media(max-width:1000px){#zipai-screen .zp-own-area{gap:7px}#zipai-screen .zp-current{--card-width:28px;--card-height:81px;width:80px}#zipai-screen .zp-opponent{width:35%}#zipai-screen .zp-opponent .zp-player{height:112px}}
-@media(max-width:600px) and (orientation:portrait){
-  body[data-screen=zipai] #zipai-screen{grid-template-rows:49px 27px 29px minmax(0,1fr);padding:7px 8px max(5px,env(safe-area-inset-bottom));gap:5px}
-  #zipai-screen .zp-arena{grid-template-columns:78px minmax(0,1fr);grid-template-rows:minmax(0,1fr) 84px var(--hand-height);gap:5px}
-  #zipai-screen .zp-own-area{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 83px;gap:6px;padding:0 1px 5px}
-  #zipai-screen .zp-self-summary{grid-area:2/1;width:100%}
-  #zipai-screen .zp-self-summary .zp-player{width:100%;height:78px;padding:4px 2px;box-sizing:border-box}
-  #zipai-screen .zp-self-melds{grid-area:1/1;max-height:100%;align-self:end}
-  #zipai-screen .zp-self-melds .zp-melds{max-height:none;min-height:0;flex-wrap:wrap}
-  #zipai-screen .zp-self-melds .zp-meld{--card-width:13px;--card-height:38px;--card-step:12px;padding-bottom:11px}
-  #zipai-screen .zp-self-melds .zp-meld .zp-face,#zipai-screen .zp-self-melds .zp-meld .zp-face-reverse{font-size:11px}
-  #zipai-screen .zp-self-melds .zp-discards{max-height:34px}
-  #zipai-screen .zp-hand-heading{height:26px;min-height:26px;font-size:9px;padding:0 2px}
-  #zipai-screen .zp-hand-heading>div{gap:4px}#zipai-screen #zp-selected{display:none}
-  #zipai-screen .zp-hand-cards{gap:4px}
-  #zipai-screen .zp-controls,#zipai-screen .zp-controls:has(.zp-ready-members){height:84px;padding:0 2px;gap:3px 5px}
-  #zipai-screen .zp-controls>p{font-size:10px}
-  #zipai-screen .zp-actions{gap:5px}
-  #zipai-screen .zp-actions .button{min-width:60px;height:38px;min-height:38px;font-size:15px;padding:5px 10px}
-  #zipai-screen .zp-option{--card-width:12px;--card-height:35px;padding:3px 5px;gap:4px}
-  #zipai-screen .zp-option .zp-face,#zipai-screen .zp-option .zp-face-reverse{font-size:10px}#zipai-screen .zp-option strong{font-size:17px}
-  #zipai-screen .zp-opponent{top:2px;width:44%;column-gap:5px;grid-template-rows:minmax(0,1fr) 13px}
-  #zipai-screen .zp-opponent .zp-player{height:89px}
-  #zipai-screen .zp-opponent .zp-melds{max-height:120px}
-  #zipai-screen .zp-opponent .zp-discards{max-height:32px}
-  #zipai-screen .zp-player{padding:5px 3px;gap:3px}
-  #zipai-screen .zp-avatar{width:26px;height:26px;font-size:18px}
-  #zipai-screen .zp-player b{font-size:18px}
-  #zipai-screen .zp-center{top:2px;width:12%;left:50%;gap:0}
-  #zipai-screen .zp-center>p{display:none}
-  #zipai-screen .zp-deck{--card-width:12px;--card-height:35px;gap:4px}
-  #zipai-screen .zp-deck strong{font-size:17px}
-  #zipai-screen .zp-current{--card-width:25px;--card-height:73px;width:74px}
-  #zipai-screen .zp-current[data-position=left]{left:22%;top:auto;bottom:0}
-  #zipai-screen .zp-current[data-position=right]{right:22%;top:auto;bottom:0}
-  #zipai-screen .zp-current[data-position=self]{left:41%;bottom:0;top:auto}
-  #zipai-screen .zp-current>small{font-size:9px;padding:2px 3px;max-width:100px}
-  #zipai-screen .zp-felt>span{top:36%;font-size:22px}
-  .zp-result-players{grid-template-areas:'self' 'left' 'right'}.zp-result-player.self{width:100%}
-  .zp-result-seats{gap:5px}.zp-result-seats button{min-height:30px;font-size:10px}
-}
-@media(max-height:600px) and (orientation:landscape){
-  body[data-screen=zipai] #zipai-screen{grid-template-rows:26px 17px 23px minmax(0,1fr);padding:3px 9px max(3px,env(safe-area-inset-bottom));gap:2px}
-  #zipai-screen .zp-arena{grid-template-columns:140px minmax(0,1fr);grid-template-rows:minmax(0,1fr) 48px var(--hand-height);gap:2px}
-  #zipai-screen .zp-own-area{grid-template-columns:64px minmax(0,1fr);gap:6px;padding:0 1px 5px}
-  #zipai-screen .zp-self-summary .zp-player{width:64px;height:92px;box-sizing:border-box;padding:4px 2px}
-  #zipai-screen .zp-self-summary .zp-player>small{display:none}
-  #zipai-screen .zp-self-melds .zp-melds{max-height:100%;min-height:0}
-  #zipai-screen .zp-self-melds .zp-discards{max-height:32px}
-  #zipai-screen .zp-self-melds .zp-meld{--card-width:13px;--card-height:37px;--card-step:11px;padding-bottom:10px}
-  #zipai-screen .zp-self-melds .zp-meld .zp-face,#zipai-screen .zp-self-melds .zp-meld .zp-face-reverse{font-size:11px}
-  #zipai-screen .zp-hand-heading{height:18px;min-height:18px;font-size:8px}
-  #zipai-screen .zp-hand-cards{padding:4px 4px 3px;gap:4px}
-  #zipai-screen .zp-controls,#zipai-screen .zp-controls:has(.zp-ready-members){height:48px;grid-template-rows:12px minmax(0,1fr);gap:1px 6px;padding:0 3px}
-  #zipai-screen .zp-controls>p{font-size:9px;min-height:11px;line-height:11px}
-  #zipai-screen .zp-actions{gap:5px}#zipai-screen .zp-actions .button{min-width:75px;min-height:29px;height:29px;font-size:14px;padding:3px 10px}
-  #zipai-screen .zp-ready-members{font-size:8px;flex-basis:auto}
-  #zipai-screen .zp-option{--card-width:8px;--card-height:23px;min-height:29px;padding:2px 5px}
-  #zipai-screen .zp-option .zp-face,#zipai-screen .zp-option .zp-face-reverse{font-size:7px;top:1px}#zipai-screen .zp-option .zp-face-reverse{top:auto;bottom:1px}#zipai-screen .zp-option strong{font-size:15px}
-  #zipai-screen .zp-opponent{top:0;width:30%;height:100%;grid-template-columns:120px minmax(0,1fr);column-gap:5px;grid-template-rows:minmax(0,1fr) 10px}
-  #zipai-screen .zp-opponent.right{grid-template-columns:minmax(0,1fr) 120px}
-  #zipai-screen .zp-opponent .zp-player{height:38px;max-height:100%;width:120px;padding:3px;display:grid;grid-template-columns:24px minmax(0,1fr);gap:1px 4px;text-align:left}
-  #zipai-screen .zp-opponent .zp-avatar{grid-row:1/3;width:23px;height:23px;font-size:16px}
-  #zipai-screen .zp-opponent .zp-player strong{font-size:9px}#zipai-screen .zp-opponent .zp-player b{font-size:14px;margin:0}#zipai-screen .zp-opponent .zp-player>small{display:none}
-  #zipai-screen .zp-opponent .zp-public{position:static;inset:auto;width:auto;max-height:100%}
-  #zipai-screen .zp-opponent .zp-melds{min-height:0;max-height:100%;gap:2px}
-  #zipai-screen .zp-opponent .zp-meld{--card-width:10px;--card-height:29px;--card-step:9px;padding-bottom:9px}
-  #zipai-screen .zp-opponent .zp-meld .zp-face,#zipai-screen .zp-opponent .zp-meld .zp-face-reverse{font-size:8px}#zipai-screen .zp-opponent .zp-meld small{font-size:6px}
-  #zipai-screen .zp-player-action{font-size:8px;line-height:10px}
-  #zipai-screen .zp-current{--card-width:14px;--card-height:40px;width:110px;flex-direction:row;gap:3px}
-  #zipai-screen .zp-current[data-position=left]{left:30%;top:1px;bottom:auto}
-  #zipai-screen .zp-current[data-position=right]{right:30%;top:1px;bottom:auto}
-  #zipai-screen .zp-current[data-position=self]{left:43%;top:1px;bottom:auto}
-  #zipai-screen .zp-current>small{font-size:8px;padding:2px;max-width:65px}
-  #zipai-screen .zp-center{top:0;width:7%}#zipai-screen .zp-center>p{display:none}#zipai-screen .zp-deck{--card-width:10px;--card-height:29px;gap:3px}#zipai-screen .zp-deck strong{font-size:15px}#zipai-screen .zp-deck small{font-size:7px}
-}
-@media(max-height:600px){#zipai-screen .zp-wake-panel{padding:8px 12px;grid-template-rows:auto minmax(30px,1fr) auto;gap:4px}.zp-wake-panel>small,.zp-wake-panel p{display:none}.zp-wake-panel h2{font-size:23px}.zp-wake-cards{max-height:85px}.zp-wake-panel>.button{min-height:32px;height:32px;font-size:14px}}
-@media(prefers-reduced-motion:reduce){.zp-wake-reveal .zp-tile{animation:none}}
+.zp-dealing .zp-hand-column{animation:zp-receive .3s calc(.35s + var(--deal-i)*70ms) both}.zp-deal-motion i{animation-duration:1s;animation-delay:calc(var(--i)*45ms)}
+.zp-waking .zp-current{visibility:hidden}
+@keyframes zp-receive{from{opacity:0;transform:translateY(-35px)}to{opacity:1;transform:none}}
+@media(max-width:600px){.zp-seat-callout{font-size:38px}.zp-seat-callout.self{left:28%;bottom:40%}.zp-win-effect>strong{font-size:62px}.zp-effect-seal{font-size:18px;right:-22px;padding:5px}.zp-effect-card{--card-width:37px;--card-height:106px}.zp-win-halo{width:280px;height:280px}.zp-wake-panel,.zp-wake-reveal{--card-width:40px;--card-height:114px;top:35%}.zp-wake-panel strong,.zp-wake-reveal strong{font-size:57px}.zp-deal-motion{--card-width:18px;--card-height:51px}.zp-deal-motion i:nth-child(3n){--dx:0px;--dy:48vh}}
+@media(max-height:480px) and (orientation:landscape){.zp-seat-callout{font-size:32px}.zp-win-effect>strong{font-size:48px}.zp-win-effect{top:28%}.zp-win-effect>small,.zp-effect-kicker{font-size:9px}.zp-effect-card{--card-width:23px;--card-height:66px;top:49%}.zp-wake-panel,.zp-wake-reveal{flex-direction:row;--card-width:25px;--card-height:71px;top:35%}.zp-wake-panel strong,.zp-wake-reveal strong{font-size:45px}.zp-deal-motion{--card-width:16px;--card-height:45px}}
+@media(prefers-reduced-motion:reduce){.zp-effects *,.zp-wake-reveal .zp-tile,.zp-card-enter>.zp-tile{animation-duration:.01ms!important;animation-delay:0ms!important}}
+@media(prefers-reduced-motion:reduce){.zp-dealing .zp-hand-column{animation:none}}
