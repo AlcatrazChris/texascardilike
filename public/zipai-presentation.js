@@ -11,6 +11,15 @@ export function scoreFormula(h,base=1){
   return `基础 ${h.baseUnits}${h.selfDraw?' + 自摸 1':''}${h.special?' + '+h.special+' 1':''} + 醒 ${wake}${h.sea?' + 海底 2':''} = ${h.units} 子 × 底分 ${base}`;
 }
 
+export function settlementSummary(h,players=[],base=1){
+  const number=new Intl.NumberFormat('zh-CN'),fmt=n=>number.format(n||0),signed=n=>(n>=0?'+':'−')+fmt(Math.abs(n));
+  const points=players.map(p=>({name:p.name,delta:p.delta??h?.delta?.[p.id]??0}));
+  if(h.draw)return {headline:'黄庄 | 庄家连庄',formula:h.drawPenalty?`庄家向闲家各付 ${fmt(h.drawPenalty)} 分`:'本局不计分',points};
+  const winner=players.find(p=>p.id===h.winner),source=h.selfDraw?'自摸胡牌':Number.isInteger(h.discarder)?`${players.find(p=>p.id===h.discarder)?.name||'玩家'}点炮`:'公牌胡牌';
+  const terms=`胡子${fmt(h.baseUnits)} + 翻醒${fmt(h.wakeUnits-(h.sea?2:0))}${h.special?' + '+h.special+'1':''}${h.sea?' + 海底2':''}`,unit=h.scoringVersion===2?(h.selfDraw?`（${terms}）× 自摸2`:terms):`${terms}${h.selfDraw?' + 自摸1':''}`;
+  return {winnerName:winner?.name||'玩家',sourceName:Number.isInteger(h.discarder)?players.find(p=>p.id===h.discarder)?.name||'玩家':null,sourceLabel:h.selfDraw?'自摸胡牌':Number.isInteger(h.discarder)?'点炮':'公牌胡牌',counts:`${fmt(h.hu)}胡${fmt(h.wakeUnits)}醒`,headline:`${winner?.name||'玩家'}胡牌［${source}］ | ${fmt(h.hu)}胡${fmt(h.wakeUnits)}醒`,formula:`${unit} = ${fmt(h.units)}子　底分${fmt(base)}${h.discardMultiplier===2?' × 点炮2':''}　总${fmt(h.delta?.[h.winner]??winner?.delta)}分`,points:points.map(p=>({...p,text:`${p.name} ${signed(p.delta)}分`,value:signed(p.delta)+'分'}))};
+}
+
 export function tileHTML(card,{winning=false}={}){
   if(card===80)return `<span class="zp-tile zp-flower zp-red" role="img" aria-label="飞飞，万能牌"><svg viewBox="0 0 50 90" aria-hidden="true"><path fill="currentColor" d="M30 12q-12-12-13 1l-7 5 9 3q-7 10-3 23L5 63l16-7-3 20h4l5-17 5 18h4l-3-24q20-12 9-32l-3 18-9-13 1-7 9-2-8-3z"/><circle cx="24" cy="16" r="1.5" fill="white"/></svg><small>飞飞</small></span>`;
   const back=card==='?',t=typeOf(card),text=back?'字':cardName(card),red=!back&&[1,6,9].includes(t%10);

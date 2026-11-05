@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {tileHTML,handColumns,resultLabels,playerResultRole,scoreFormula} from '../public/zipai-presentation.js';
+import {tileHTML,handColumns,resultLabels,playerResultRole,scoreFormula,settlementSummary} from '../public/zipai-presentation.js';
 import * as z from '../lib/zipai.mjs';
+
+test('结算三行摘要显示来源、胡醒、完整算式及三人分数',()=>{const players=[{id:0,name:'A',delta:32},{id:1,name:'B',delta:-16},{id:2,name:'C',delta:-16}],h={winner:0,hu:33,wakeUnits:3,baseUnits:5,units:16,selfDraw:true,scoringVersion:2,delta:[32,-16,-16]};const summary=settlementSummary(h,players,1);assert.equal(summary.headline,'A胡牌［自摸胡牌］ | 33胡3醒');assert.equal(summary.formula,'（胡子5 + 翻醒3）× 自摸2 = 16子　底分1　总32分');assert.deepEqual(summary.points.map(p=>p.text),['A +32分','B −16分','C −16分']);});
+test('点炮和海底算式不能重复计入翻醒，总分取实际获分',()=>{const players=[{id:0,name:'甲'},{id:1,name:'乙'},{id:2,name:'丙'}],h={winner:0,discarder:1,hu:22,wakeUnits:2,sea:true,baseUnits:3,units:5,scoringVersion:2,discardMultiplier:2,delta:[20,-20,0]},s=settlementSummary(h,players,2);assert.equal(s.headline,'甲胡牌［乙点炮］ | 22胡2醒');assert.match(s.formula,/胡子3 \+ 翻醒0 \+ 海底2 = 5子/);assert.match(s.formula,/底分2 × 点炮2　总20分/);});
 
 test('自摸将基础和醒一起翻倍，旧记录保留旧算法展示',()=>{
   const record={baseUnits:3,wakeUnits:2,selfDraw:true,units:10,scoringVersion:2};
