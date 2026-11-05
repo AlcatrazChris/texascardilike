@@ -1,5 +1,5 @@
 // Layout is a client preference. It never changes hand ownership or legal moves.
-const type=card=>Math.floor(card/4);
+const type=card=>card>=100&&card<120?card-100:Math.floor(card/4);
 // Reserve all five rows up front. Neither sorting nor a changed group length
 // may resize cards or displace the table and its controls.
 export function handGeometry(width,height){
@@ -10,13 +10,15 @@ export function handGeometry(width,height){
 }
 export function handSpread(width,cardWidth,count){
   const pitch=Math.min(cardWidth+6,Math.max(0,(width-cardWidth-3)/Math.max(1,count-1)));
-  return Array.from({length:count},(_,i)=>Math.round(i*pitch));
+  const offset=Math.max(0,(width-cardWidth-pitch*Math.max(0,count-1))/2);
+  return Array.from({length:count},(_,i)=>Math.round(offset+i*pitch));
 }
 const patterns=[];
 for(const base of [0,10]){patterns.push({types:[base+1,base+6,base+9],score:14},{types:[base,base+1,base+2],score:14});for(let n=1;n<8;n++)patterns.push({types:[base+n,base+n+1,base+n+2],score:10});}
 for(let n=0;n<10;n++)patterns.push({types:[n,n,n+10],score:9},{types:[n,n+10,n+10],score:9});
 
 export function autoArrange(cards){
+  if(cards.includes(80)){const layout=autoArrange(cards.filter(c=>c!==80));layout.columns.push({id:'c'+layout.nextId++,cards:[80]});return layout;}
   const sorted=cards.slice().sort((a,b)=>a-b),counts=Array(20).fill(0),fixed=[];for(const c of sorted)counts[type(c)]++;
   for(let t=0;t<20;t++)if(counts[t]>=3){fixed.push(Array(counts[t]).fill(t));counts[t]=0;}
   const memo=new Map();
