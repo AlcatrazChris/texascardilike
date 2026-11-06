@@ -3,6 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
-  "scripts": { "dev": "node server.mjs", "start": "node server.mjs", "test": "node --test tests/*.test.mjs", "build": "node scripts/check.mjs" }
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/check.mjs",
+    "test:ui": "playwright test --config playwright.config.mjs",
+    "test:ui:update": "playwright test --config playwright.config.mjs --update-snapshots"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
 }

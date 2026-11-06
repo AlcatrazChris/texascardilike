@@ -10,6 +10,10 @@ if(existsSync('.env.local'))for(const line of readFileSync('.env.local','utf8').
 }
 for(const path of files){
   const safeTemplate=/^\.env(?:\.[\w-]+)*\.example$/.test(path);
+  // Versioned visual evidence is development-only, never a production source blob.
+  if(/^(?:tests\/visual\/baselines|docs\/ui-rebuild\/evidence)\/.+\.png$/.test(path)){
+    const stat=lstatSync(path),raw=readFileSync(path);if(stat.isSymbolicLink()||!stat.isFile()||stat.size>2000000||!raw.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))problems.push({path,reason:'invalid visual evidence'});continue;
+  }
   if(/(^|\/)(?:node_modules|\.tools|\.vercel|\.git|\.aws|\.codex|\.agents|coverage|\.cache|\.tmp)(\/|$)/.test(path)||/^\.env(?:\.|$)/.test(path)&&!safeTemplate||/\.(?:log|pem|key|p12|pfx)$/i.test(path)){problems.push({path,reason:'private or generated path'});continue;}
   const stat=lstatSync(path);if(stat.isSymbolicLink()||!stat.isFile()||stat.size>250000){problems.push({path,reason:'unexpected file type or size'});continue;}
   const raw=readFileSync(path);if(raw.includes(0)){problems.push({path,reason:'unexpected binary file'});continue;}

@@ -9,6 +9,10 @@ node_modules/
 .git/
 *.log
 coverage/
+playwright-report/
+test-results/
+tests/visual/baselines/
+docs/ui-rebuild/evidence/
 .nyc_output/
 .cache/
 .tmp/

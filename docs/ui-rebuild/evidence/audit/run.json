@@ -1,0 +1,12 @@
+{
+  "browser": "156.0.4314.58",
+  "viewports": 10,
+  "create": true,
+  "aiFill": true,
+  "selectSort": true,
+  "statistics": true,
+  "refreshReconnect": true,
+  "complete": true,
+  "nextHand": true,
+  "errors": []
+}

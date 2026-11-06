@@ -1,0 +1,21 @@
+#zipai-screen,
+.zp-public-dialog,
+.zp-settings {
+  --zp-felt: #194b3d;
+  --zp-depth: #10392f;
+  --zp-panel: #215447;
+  --zp-paper: #fffbed;
+  --zp-ink: #183629;
+  --zp-text: #f2f3de;
+  --zp-muted: #c1d2c5;
+  --zp-gold: #e4c783;
+  --zp-red: #be3438;
+  --zp-line: #9fb9a15c;
+  --zp-radius: 14px;
+  --zp-ui: system-ui, "Microsoft YaHei", "PingFang SC", sans-serif;
+  --zp-face: "KaiTi", "STKaiti", "Noto Serif SC", serif;
+  --zp-shadow: 0 3px 10px #09281e24;
+  --zp-focus: 0 0 0 3px #f3dc9c;
+  --zp-fast: 140ms;
+  --zp-ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+}
